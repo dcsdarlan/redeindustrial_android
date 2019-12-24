@@ -1,10 +1,10 @@
 package br.com.redeindustrial.adapters;
 
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +15,7 @@ import com.android.volley.toolbox.NetworkImageView;
 
 import java.util.List;
 
+import br.com.redeindustrial.DetailActivity;
 import br.com.redeindustrial.R;
 import br.com.redeindustrial.json.BeerResponse;
 
@@ -25,7 +26,7 @@ public class BeersRecyclerViewAdapter extends RecyclerView.Adapter<BeersRecycler
     protected AppCompatActivity context;
     protected ImageLoader imageLoader;
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         public NetworkImageView networkImageView;
         public TextView titleTextViewViewHolder;
@@ -36,6 +37,15 @@ public class BeersRecyclerViewAdapter extends RecyclerView.Adapter<BeersRecycler
             networkImageView = view.findViewById(R.id.networkImageView);
             titleTextViewViewHolder = view.findViewById(R.id.titleTextView);
             descriptionTextViewViewHolder = view.findViewById(R.id.descriptionTextView);
+            view.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(context, DetailActivity.class);
+            intent.putExtra("ITEM", itens.get(getAdapterPosition()));
+            context.startActivity(intent);
+            context.overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         }
     }
 
@@ -57,7 +67,7 @@ public class BeersRecyclerViewAdapter extends RecyclerView.Adapter<BeersRecycler
     public void onBindViewHolder(BeersRecyclerViewAdapter.ViewHolder holder, int position) {
         BeerResponse it = this.itens.get(position);
         holder.titleTextViewViewHolder.setText(it.name);
-        holder.descriptionTextViewViewHolder.setText(it.tagline);
+        holder.descriptionTextViewViewHolder.setText(it.first_brewed);
         holder.networkImageView.setImageUrl(it.image_url, imageLoader);
     }
 
