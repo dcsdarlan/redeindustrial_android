@@ -10,6 +10,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
+
 import java.util.List;
 
 import br.com.redeindustrial.R;
@@ -20,30 +23,32 @@ public class BeersRecyclerViewAdapter extends RecyclerView.Adapter<BeersRecycler
 
     protected List<BeerResponse> itens;
     protected AppCompatActivity context;
+    protected ImageLoader imageLoader;
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
-        public ImageView imageViewViewHolder;
+        public NetworkImageView networkImageView;
         public TextView titleTextViewViewHolder;
         public TextView descriptionTextViewViewHolder;
 
         public ViewHolder(View view) {
             super(view);
-            imageViewViewHolder = view.findViewById(R.id.imageView);
+            networkImageView = view.findViewById(R.id.networkImageView);
             titleTextViewViewHolder = view.findViewById(R.id.titleTextView);
             descriptionTextViewViewHolder = view.findViewById(R.id.descriptionTextView);
         }
     }
 
-    public BeersRecyclerViewAdapter(AppCompatActivity context, List<BeerResponse> itens) {
+    public BeersRecyclerViewAdapter(AppCompatActivity context, ImageLoader imageLoader, List<BeerResponse> itens) {
         this.itens = itens;
         this.context = context;
+        this.imageLoader = imageLoader;
     }
 
     @Override
     public BeersRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_list_search, parent, false);
+                .inflate(R.layout.item_list_beers, parent, false);
         BeersRecyclerViewAdapter.ViewHolder vh = new BeersRecyclerViewAdapter.ViewHolder(view);
         return vh;
     }
@@ -53,16 +58,7 @@ public class BeersRecyclerViewAdapter extends RecyclerView.Adapter<BeersRecycler
         BeerResponse it = this.itens.get(position);
         holder.titleTextViewViewHolder.setText(it.name);
         holder.descriptionTextViewViewHolder.setText(it.tagline);
-        //holder.ratingTextViewViewHolder.setText(it.rating);
-
-        /*
-        Bitmap batmapBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.storie);
-        RoundedBitmapDrawable circularBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), batmapBitmap);
-
-        circularBitmapDrawable.setCircular(true);
-        holder.imageViewViewHolder.setImageDrawable(circularBitmapDrawable);
-
-         */
+        holder.networkImageView.setImageUrl(it.image_url, imageLoader);
     }
 
     @Override

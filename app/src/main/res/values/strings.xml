@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">RedeIndustrial</string>
     <string name="url_webservice">http://redeindustrial.inicialize.com.br/api/beers</string>
-
     <string name="title_main">RedeIndustrial</string>
 </resources>

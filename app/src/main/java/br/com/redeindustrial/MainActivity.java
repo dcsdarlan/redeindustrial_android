@@ -2,10 +2,12 @@ package br.com.redeindustrial;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.collection.LruCache;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +15,7 @@ import android.widget.RelativeLayout;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.common.reflect.TypeToken;
@@ -31,12 +34,22 @@ public class MainActivity extends AppCompatActivity {
     protected RecyclerView recyclerView;
     protected RelativeLayout loadRelativeLayout, errorRelativeLayout;
     protected RequestQueue requestQueue;
+    protected ImageLoader imageLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         requestQueue = Volley.newRequestQueue(MainActivity.this);
+        imageLoader = new ImageLoader(requestQueue, new ImageLoader.ImageCache() {
+            private final LruCache<String, Bitmap> cache = new LruCache<>(50);
+            public void putBitmap(String url, Bitmap bitmap) {
+                cache.put(url, bitmap);
+            }
+            public Bitmap getBitmap(String url) {
+                return cache.get(url);
+            }
+        });
 
         toolbarTop = findViewById(R.id.topToolbar);
         setSupportActionBar(toolbarTop);
@@ -48,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setVisibility(View.GONE);
         loadRelativeLayout.setVisibility(View.VISIBLE);
 
-        StringRequest listRequest = new StringRequest(Request.Method.POST,
+        StringRequest listRequest = new StringRequest(Request.Method.GET,
                 getString(R.string.url_webservice),
                 response -> {
                 Log.i(MainActivity.class.getSimpleName(), "Listando...");
@@ -62,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                     DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                             layoutManager.getOrientation());
                     recyclerView.addItemDecoration(dividerItemDecoration);
-                    recyclerView.setAdapter(new BeersRecyclerViewAdapter(MainActivity.this, beers));
+                    recyclerView.setAdapter(new BeersRecyclerViewAdapter(MainActivity.this, imageLoader, beers));
 
                     errorRelativeLayout.setVisibility(View.GONE);
                     loadRelativeLayout.setVisibility(View.GONE);
